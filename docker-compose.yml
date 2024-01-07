@@ -98,10 +98,10 @@ services:
       - ./storefront:/app/storefront
       - storefront_node_modules:/app/storefront/node_modules
     ports:
-      - "8100:8100"
+      - "8000:8000"
     environment:
-      NEXT_PUBLIC_MEDUSA_BACKEND_URL: http://localhost:9000
-      NEXT_PUBLIC_BASE_URL: http://localhost:8100
+      NEXT_PUBLIC_MEDUSA_BACKEND_URL: http://backend:9000
+      NEXT_PUBLIC_BASE_URL: http://localhost:8000
 
 volumes:
   admin_node_modules:
