@@ -1,6 +1,0 @@
-# Don't copy these dirs to build context
-.cache/
-.github/
-.storybook/
-public/
-node_modules/

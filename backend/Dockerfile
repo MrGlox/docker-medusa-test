@@ -1,27 +1,35 @@
-# Set the base image to Node 18-alpine3.18
-FROM node:18-alpine3.18
+# Use an official Node 18 Alpine runtime as the parent image
+FROM node:20-slim AS base
 
-# Set the working directory
-WORKDIR /app/medusa
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
 
-# Copy the necessary files
-COPY package.json .
-COPY develop.sh .
+RUN corepack enable
 
-# Run the apk update command to update package information
-RUN apk update
+# Set the working directory in the container
+WORKDIR /usr/src/app
 
-RUN npm i -g npm@latest
+# Install pnpm
+RUN pnpm add @medusajs/medusa-cli -g
 
-# Install dependencies
-RUN npm i 
-# --network-timeout 100000000
+# Copy package.json and pnpm-lock.yaml
+COPY package.json pnpm-lock.yaml ./
 
-# Install the medusa-cli
-RUN npm i -g @medusajs/medusa-cli@latest
+# Install any needed packages
+RUN pnpm install --frozen-lockfile --shamefully-hoist
 
-# Add the remaining files
+# Bundle app source
 COPY . .
 
-# Set the default command to run when the container starts
-ENTRYPOINT ["sh", "develop.sh"]
+# Make port 9000 available to the world outside this container
+EXPOSE 9000
+EXPOSE 7001
+
+# Define environment variables
+# ENV NODE_ENV production
+
+RUN medusa migrations run
+RUN medusa seed 
+
+# Run the app
+CMD ["pnpm", "dev"]
